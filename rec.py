@@ -24,7 +24,9 @@ except KeyboardInterrupt:
         f'record-{time}-{source}.wav'
         for source in sources
     )
-    out_file = f'record-{time}.wav'
+    out_file = f'record-{time}.ogg'
     cmd = f"sox -m {files} {out_file}"
     subprocess.check_call(cmd, shell=True)
     print(f'Result is written into {out_file}')
+    subprocess.check_call(f"rm {files}", shell=True)
+
