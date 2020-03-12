@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-
+import argparse
 import os
 import subprocess
 from contextlib import ExitStack
@@ -32,7 +32,7 @@ def rm_files(file_names):
         os.unlink(file_name)
 
 
-def main():
+def main(message: str = None):
     timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
 
     sources = get_sources()
@@ -40,7 +40,11 @@ def main():
         f"record-{timestamp}-{source}.wav"
         for source in sources
     ]
-    result_file_name = f"record-{timestamp}.ogg"
+    if message:
+        message = message.replace("/", "-")
+        result_file_name = f"record-{timestamp}-{message}.ogg"
+    else:
+        result_file_name = f"record-{timestamp}.ogg"
 
     try:
         print("Recording...")
@@ -52,5 +56,12 @@ def main():
         rm_files(tmp_result_file_names)
 
 
+def cli(args=None):
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-m", "--message", help="Comment for the record")
+    args = parser.parse_args(args)
+    main(message=args.message)
+
+
 if __name__ == "__main__":
-    main()
+    cli()
