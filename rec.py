@@ -47,7 +47,7 @@ def main(comment: str = None):
         result_file_name = f"record-{timestamp}.ogg"
 
     try:
-        print("Recording...")
+        print("Recording... Press CTRL+C to finish")
         record_audio(sources, tmp_result_file_names)
     except KeyboardInterrupt:
         print("\nFinishing...")
