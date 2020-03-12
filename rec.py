@@ -22,8 +22,9 @@ def record_audio(sources, result_file_names):
             stack.enter_context(subprocess.Popen(cmd, shell=True))
 
 
-def merge_audios(input_file_names, output_file_name):
-    cmd = ["sox", "-m"] + input_file_names + [output_file_name]
+def merge_audios(input_file_names, output_file_name, comment):
+    comment_args = ["--comment", comment] if comment else []
+    cmd = ["sox", "-m", *input_file_names, *comment_args, output_file_name]
     subprocess.check_call(cmd)
 
 
@@ -32,7 +33,7 @@ def rm_files(file_names):
         os.unlink(file_name)
 
 
-def main(message: str = None):
+def main(comment: str = None):
     timestamp = datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
 
     sources = get_sources()
@@ -40,9 +41,8 @@ def main(message: str = None):
         f"record-{timestamp}-{source}.wav"
         for source in sources
     ]
-    if message:
-        message = message.replace("/", "-")
-        result_file_name = f"record-{timestamp}-{message}.ogg"
+    if comment:
+        result_file_name = f"record-{timestamp}-{comment.replace('/', '-')}.ogg"
     else:
         result_file_name = f"record-{timestamp}.ogg"
 
@@ -51,16 +51,16 @@ def main(message: str = None):
         record_audio(sources, tmp_result_file_names)
     except KeyboardInterrupt:
         print("\nFinishing...")
-        merge_audios(tmp_result_file_names, result_file_name)
+        merge_audios(tmp_result_file_names, result_file_name, comment)
         print(f"Result is written into {result_file_name}")
         rm_files(tmp_result_file_names)
 
 
 def cli(args=None):
     parser = argparse.ArgumentParser()
-    parser.add_argument("-m", "--message", help="Comment for the record")
+    parser.add_argument("-m", "--message", help="Comment message for the record")
     args = parser.parse_args(args)
-    main(message=args.message)
+    main(comment=args.message)
 
 
 if __name__ == "__main__":
